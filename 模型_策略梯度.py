@@ -46,7 +46,7 @@ class Decoder(nn.Module):
                                     device=图向量.device)
 
 
-        x = 图向量+self.embedP(position)+self.embedX(操作)*0
+        x = 图向量+self.embedP(position)+self.embedX(操作)*0 # embedding输出 + 位置编码输出
 
 
 
@@ -62,9 +62,9 @@ class Transformer(nn.Module):
 
 
         self.decoder = Decoder(trg_vocab, d_model, N, heads, dropout)
-        self.outX = 全连接层(d_model, trg_vocab)
+        self.outX = 全连接层(d_model, trg_vocab) # 提取6种状态
 
-        self.评价 = 全连接层(d_model, 1)
+        self.评价 = 全连接层(d_model, 1) ## PPO所需
     def forward(self, 图向量 ,操作, trg_mask):
         图向量=self.图转(图向量)
 

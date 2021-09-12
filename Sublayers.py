@@ -94,6 +94,7 @@ class 全连接层(nn.Module):
     def __init__(self,输入_接口, 输出_接口):
         super().__init__()
         np.random.seed(1)
+        # 随机采样转张量转参数
         self.weight = nn.Parameter(torch.FloatTensor(np.random.uniform(-1/np.sqrt(输入_接口), 1/np.sqrt(输入_接口), (输入_接口, 输出_接口))))
         self.bias = nn.Parameter(torch.FloatTensor(np.random.uniform(-1/np.sqrt(输入_接口), 1/np.sqrt(输入_接口), 输出_接口)))
 
