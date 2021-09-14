@@ -115,7 +115,7 @@ class AgentPPO:
 
         self.ratio_clip = 0.2  # ratio.clamp(1 - clip, 1 + clip)
         self.lambda_entropy = 0.02  # could be 0.01~0.05
-        self.lambda_gae_adv = 0.98  # could be 0.95~0.99, GAE (Generalized Advantage Estimation. ICLR.2016.)
+        self.lambda_gae_adv = 0.98  # could be 0.95~0.99, GAE (广义优势评估. ICLR.2016.)
         self.get_reward_sum = None  # self.get_reward_sum_gae if if_use_gae else self.get_reward_sum_raw
         self.trajectory_list = None
 
@@ -166,7 +166,7 @@ class AgentPPO:
             # (ten_state, ten_action, ten_noise, ten_reward, ten_mask) = buffer
 
             '''get buf_r_sum, buf_logprob'''
-            bs = 2 ** 10  # set a smaller 'BatchSize' when out of GPU memory.
+            bs = 2 ** 10  # 超出显存设置更小BatchSize
             buf_value = [self.cri_target(buf_state[i:i + bs]) for i in range(0, buf_len, bs)]
             buf_value = torch.cat(buf_value, dim=0)
             buf_logprob = self.act.get_old_logprob(buf_action, buf_noise)
@@ -271,43 +271,42 @@ class AgentDiscretePPO(AgentPPO):
 
 class Arguments:
     def __init__(self, agent=None, env=None, if_on_policy=False):
-        self.agent = agent  # Deep Reinforcement Learning algorithm
-        self.env = env  # the environment for training
+        self.agent = agent  # 深度强化学习算法
+        self.env = env  # 培训环境
 
-        self.cwd = None  # current work directory. None means set automatically
-        self.if_remove = True  # remove the cwd folder? (True, False, None:ask me)
-        self.break_step = 2 ** 20  # break training after 'total_step > break_step'
-        self.if_allow_break = True  # allow break training when reach goal (early termination)
-
+        self.cwd = None  # 当前的工作目录。 None表示自动设置  
+        self.if_remove = True  # 删除CWD文件夹? (True, False, None:ask me)
+        self.break_step = 2 ** 20  # 打破培训 'total_step > break_step'
+        self.if_allow_break = True  # 达到目标后允许休息(提前终止)  
         self.visible_gpu = '0'  # for example: os.environ['CUDA_VISIBLE_DEVICES'] = '0, 2,'
-        self.worker_num = 2  # rollout workers number pre GPU (adjust it to get high GPU usage)
+        self.worker_num = 2  # rollout workers number pre GPU (调整它以获得高GPU使用率)  
         self.num_threads = 8  # cpu_num for evaluate model, torch.set_num_threads(self.num_threads)
 
         '''Arguments for training'''
-        self.gamma = 0.99  # discount factor of future rewards
-        self.reward_scale = 2 ** 0  # an approximate target reward usually be closed to 256
+        self.gamma = 0.99  # 未来回报的折现系数
+        self.reward_scale = 2 ** 0  # 一个近似的目标奖励通常接近256  
         self.learning_rate = 2 ** -14  # 2 ** -14 ~= 6e-5
         self.soft_update_tau = 2 ** -8  # 2 ** -8 ~= 5e-3
 
         if if_on_policy:  # (on-policy)
-            self.net_dim = 2 ** 9  # the network width
+            self.net_dim = 2 ** 9  # 网络的宽度
             self.batch_size = self.net_dim * 2  # num of transitions sampled from replay buffer.
-            self.repeat_times = 2 ** 3  # collect target_step, then update network
-            self.target_step = 2 ** 12  # repeatedly update network to keep critic's loss small
-            self.max_memo = self.target_step  # capacity of replay buffer
-            self.if_per_or_gae = False  # GAE for on-policy sparse reward: Generalized Advantage Estimation.
+            self.repeat_times = 2 ** 3  # 收集 target_step, 然后更新网络
+            self.target_step = 2 ** 12  # 不断更新网络，减少critic的损失  
+            self.max_memo = self.target_step  # replay buffer容量
+            self.if_per_or_gae = False  # GAE for on-policy 稀疏奖励: 估计广义的优势。
         else:
-            self.net_dim = 2 ** 8  # the network width
+            self.net_dim = 2 ** 8  # 网络的宽度
             self.batch_size = self.net_dim  # num of transitions sampled from replay buffer.
-            self.repeat_times = 2 ** 0  # repeatedly update network to keep critic's loss small
-            self.target_step = 2 ** 10  # collect target_step, then update network
-            self.max_memo = 2 ** 17  # capacity of replay buffer
-            self.if_per_or_gae = False  # PER for off-policy sparse reward: Prioritized Experience Replay.
+            self.repeat_times = 2 ** 0  # 不断更新网络，减少critic的损失  
+            self.target_step = 2 ** 10  # 收集 target_step, 然后更新网络
+            self.max_memo = 2 ** 17  # replay buffer容量
+            self.if_per_or_gae = False  # PER for off-policy 稀疏奖励: 按重要性 Replay.
 
         '''Arguments for evaluate'''
         self.eval_gap = 2 ** 6  # evaluate the agent per eval_gap seconds
-        self.eval_times1 = 2  # number of times that get episode return in first
-        self.eval_times2 = 4  # number of times that get episode return in second
+        self.eval_times1 = 2  # number of times that get episode 回报 in first
+        self.eval_times2 = 4  # number of times that get episode 回报 in second
         self.random_seed = 0  # initialize random seed in self.init_before_training()
 
     def init_before_training(self, if_main):
@@ -316,7 +315,7 @@ class Arguments:
             self.cwd = f'./{agent_name}_{self.env.env_name}_{self.visible_gpu}'
 
         if if_main:
-            import shutil  # remove history according to bool(if_remove)
+            import shutil  # 根据if_remove删除历史记录
             if self.if_remove is None:
                 self.if_remove = bool(input(f"| PRESS 'y' to REMOVE: {self.cwd}? ") == 'y')
             elif self.if_remove:
@@ -500,6 +499,7 @@ class PreprocessEnv(gym.Wrapper):  # environment wrapper
 
     def step(self, action: np.ndarray) -> (np.ndarray, float, bool, dict):
         state, reward, done, info_dict = self.env.step(action * self.action_max)
+        self.env.render()
         return state.astype(np.float32), reward, done, info_dict
 
 
@@ -552,7 +552,7 @@ def demo_continuous_action():
     args.agent.cri_target = True
     args.visible_gpu = '0'
 
-    if_train_pendulum = 1
+    if_train_pendulum = 0
     if if_train_pendulum:
         "TotalStep: 4e5, TargetReward: -200, UsedTime: 400s"
         args.env = PreprocessEnv(env=gym.make('Pendulum-v0'))  # env='Pendulum-v0' is OK.
@@ -571,7 +571,7 @@ def demo_continuous_action():
         args.if_per_or_gae = True
         args.gamma = 0.98
 
-    if_train_bipedal_walker = 0
+    if_train_bipedal_walker = 1
     if if_train_bipedal_walker:
         "TotalStep: 8e5, TargetReward: 300, UsedTime: 1800s"
         args.env = PreprocessEnv(env=gym.make('BipedalWalker-v3'))
