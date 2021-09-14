@@ -14,7 +14,7 @@ if __name__ == '__main__':
                     input_dims=env.observation_space.shape)
     n_games = 300
 
-    figure_file = 'plots/cartpole.png'
+    figure_file = './cartpole.png'
 
     best_score = env.reward_range[0]
     score_history = []
@@ -37,13 +37,14 @@ if __name__ == '__main__':
                 agent.learn()
                 learn_iters += 1
             observation = observation_
+            env.render()
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])
 
         if avg_score > best_score:
             best_score = avg_score
             agent.save_models()
-
+        
         print('episode', i, 'score %.1f' % score, 'avg score %.1f' % avg_score,
                 'time_steps', n_steps, 'learning_steps', learn_iters)
     x = [i+1 for i in range(len(score_history))]
