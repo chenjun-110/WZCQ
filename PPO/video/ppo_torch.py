@@ -57,7 +57,7 @@ class ActorNetwork(nn.Module):
                 nn.ReLU(),
                 nn.Linear(fc1_dims, fc2_dims),
                 nn.ReLU(),
-                nn.Linear(fc2_dims, n_actions),
+                nn.Linear(fc2_dims, n_actions),#n_actions在2维里代表有多少种动作
                 nn.Softmax(dim=-1) #动作概率
         )
 
@@ -140,9 +140,9 @@ class Agent:
 
         dist = self.actor(state)
         value = self.critic(state)
-        action = dist.sample()
+        action = dist.sample() #根据概率抽样出动作
 
-        log = dist.log_prob(action)# 动作的概率的对数
+        log = dist.log_prob(action)# 动作的抽样概率的对数
         probs = T.squeeze(dist.log_prob(action)).item() #squeeze压维度，(1)->数字
         action = T.squeeze(action).item()
         value = T.squeeze(value).item()

@@ -1,32 +1,38 @@
-import win32gui
-hwnd_title = dict()
-def get_all_hwnd(hwnd,mouse):
-  if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
-    hwnd_title.update({hwnd:win32gui.GetWindowText(hwnd)})
+# import win32gui
+# hwnd_title = dict()
+# def get_all_hwnd(hwnd,mouse):
+#   if win32gui.IsWindow(hwnd) and win32gui.IsWindowEnabled(hwnd) and win32gui.IsWindowVisible(hwnd):
+#     hwnd_title.update({hwnd:win32gui.GetWindowText(hwnd)})
  
-win32gui.EnumWindows(get_all_hwnd, 0)
-titles = []
-for h,t in hwnd_title.items():
-  if t is not "":
-    titles.append(t)
-    print('h:',h, ' t:',t)
+# win32gui.EnumWindows(get_all_hwnd, 0)
+# titles = []
+# for h,t in hwnd_title.items():
+#   if t is not "":
+#     titles.append(t)
+#     print('h:',h, ' t:',t)
 
 import win32gui
 from PIL import ImageGrab
 import win32con
 
-hwnd_ = win32gui.FindWindow(None,"doNotTouchWhite - Google Chrome")
-if not hwnd_:
-    print( 'window not found!')
-else:
-    print('hwnd_',hwnd_)
+def getPic () :
+  hwnd_ = win32gui.FindWindow(None,"doNotTouchWhite - Google Chrome")
+  if not hwnd_:
+      print( 'window not found!')
+  else:
+      print('hwnd_',hwnd_)
 
-# win32gui.ShowWindow(hwnd_, win32con.SW_RESTORE) # 强行显示界面后才好截图
-win32gui.SetForegroundWindow(hwnd_)  # 将窗口提到最前
-game_rect = win32gui.GetWindowRect(hwnd_)
-src_image = ImageGrab.grab(game_rect) #截桌面
-# src_image = ImageGrab.grab((game_rect[0] + 9, game_rect[1] + 190, game_rect[2] - 9, game_rect[1] + 190 + 450))
-src_image.show()
+  win32gui.ShowWindow(hwnd_, win32con.SW_RESTORE) # 强行显示界面后才好截图
+  win32gui.SetForegroundWindow(hwnd_)  # 将窗口提到最前
+  game_rect = win32gui.GetWindowRect(hwnd_)
+  w = 400*2.5
+  h = 600*2.5
+  x = 145
+  y = 445
+  src_image = ImageGrab.grab(bbox = (x, y, x+w, y+h)) #截桌面
+  # src_image = ImageGrab.grab((game_rect[0] + 9, game_rect[1] + 190, game_rect[2] - 9, game_rect[1] + 190 + 450))
+  # src_image.show()
+  return src_image
 
 
 # #对后台窗口截图
@@ -91,10 +97,10 @@ src_image.show()
 ##方法三（后续转第二部分）
  
 #内存释放
-win32gui.DeleteObject(saveBitMap.GetHandle())
-saveDC.DeleteDC()
-mfcDC.DeleteDC()
-win32gui.ReleaseDC(hWnd,hWndDC)
+# win32gui.DeleteObject(saveBitMap.GetHandle())
+# saveDC.DeleteDC()
+# mfcDC.DeleteDC()
+# win32gui.ReleaseDC(hWnd,hWndDC)
  
 ##方法二（第二部分）：PIL保存
 ###PrintWindow成功,保存到文件,显示到屏幕

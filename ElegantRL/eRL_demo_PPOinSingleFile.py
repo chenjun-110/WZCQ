@@ -28,7 +28,7 @@ class ActorPPO(nn.Module):
         return self.net(state).tanh()  # action.tanh()
 
     def get_action(self, state):
-        a_avg = self.net(state)
+        a_avg = self.net(state) #连续概率
         a_std = self.a_logstd.exp()
 
         noise = torch.randn_like(a_avg)
@@ -65,7 +65,7 @@ class ActorDiscretePPO(nn.Module):
         return self.net(state)  # action_prob without softmax
 
     def get_action(self, state):
-        a_prob = self.soft_max(self.net(state))
+        a_prob = self.soft_max(self.net(state)) #离散概率
         # action = Categorical(a_prob).sample()
         samples_2d = torch.multinomial(a_prob, num_samples=1, replacement=True)
         action = samples_2d.reshape(state.size(0))
