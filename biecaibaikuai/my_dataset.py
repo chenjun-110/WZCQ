@@ -5,7 +5,7 @@ from torchvision import transforms
 import matplotlib.pyplot as plt
 
 class MyDataSet(Dataset):
-    """自定义数据集"""
+    """自定义数据集1"""
 
     def __init__(self, images_path: list, images_class: list, transform=None):
         self.images_path = images_path
